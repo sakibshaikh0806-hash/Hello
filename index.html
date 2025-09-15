@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Display C Program — Stack (Array)</title>
+  <style>
+    body {
+      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+      margin: 24px;
+      background: #f6f8fa;
+      color: #0f172a;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    h1 { font-size: 1.25rem; margin: 0 0 8px 0; }
+    p { margin: 0 0 16px 0; color: #334155; }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.06);
+      padding: 18px;
+      overflow: auto;
+    }
+
+    pre {
+      margin: 0;
+      padding: 16px;
+      border-radius: 8px;
+      background: #0b1220;
+      color: #e6edf3;
+      line-height: 1.45;
+      font-family: "Courier New", monospace;
+      font-size: 14px;
+      white-space: pre;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    button {
+      background: linear-gradient(180deg,#0ea5a3,#0284c7);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 3px 8px rgba(2,6,23,0.12);
+    }
+
+    button.secondary {
+      background: linear-gradient(180deg,#64748b,#475569);
+    }
+
+    small.note {
+      display: block;
+      margin-top: 12px;
+      color: #475569;
+    }
+
+    /* simple inline syntax-ish colors for readability (not a full highlighter) */
+    .kw { color: #ffb86b; }      /* keywords */
+    .type { color: #7ee787; }    /* types */
+    .comment { color: #94a3b8; }  /* comments */
+    .str { color: #f8c291; }     /* strings */
+    .num { color: #f5a1c1; }     /* numeric */
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Stack Implementation in C (Array-based)</h1>
+        <p>View, copy, or download the C source that implements a simple stack with push, pop, peek and display.</p>
+      </div>
+    </header>
+
+    <section class="card" aria-label="C code display">
+      <!-- store raw C source safely in a script tag (type text/plain) to avoid escaping -->
+      <script id="cCode" type="text/plain">
+/* stack_array.c
+   Simple stack implementation using an array in C.
+   Compile with: gcc stack_array.c -o stack_array
+*/
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100
+
+typedef struct {
+    int arr[MAX];
+    int top;
+} Stack;
+
+void init(Stack *s) {
+    s->top = -1;
+}
+
+int isEmpty(Stack *s) {
+    return s->top == -1;
+}
+
+int isFull(Stack *s) {
+    return s->top == MAX - 1;
+}
+
+void push(Stack *s, int value) {
+    if (isFull(s)) {
+        printf("Stack overflow! Cannot push %d\n", value);
+        return;
+    }
+    s->arr[++(s->top)] = value;
+}
+
+int pop(Stack *s) {
+    if (isEmpty(s)) {
+        printf("Stack underflow! Returning -1\n");
+        return -1; // sentinel — in real use handle error differently
+    }
+    return s->arr[(s->top)--];
+}
+
+int peek(Stack *s) {
+    if (isEmpty(s)) {
+        printf("Stack is empty! Returning -1\n");
+        return -1;
+    }
+    return s->arr[s->top];
+}
+
+void display(Stack *s) {
+    if (isEmpty(s)) {
+        printf("Stack is empty.\n");
+        return;
+    }
+    printf("Stack elements (top -> bottom): ");
+    for (int i = s->top; i >= 0; --i) {
+        printf("%d ", s->arr[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    Stack st;
+    init(&st);
+
+    push(&st, 10);
+    push(&st, 20);
+    push(&st, 30);
+
+    display(&st);
+
+    printf("Popped: %d\n", pop(&st));
+    printf("Top element now: %d\n", peek(&st));
+
+    display(&st);
+
+    return 0;
+}
+      </script>
+
+      <!-- area where code will be shown (filled by JS) -->
+      <pre id="codeBlock" tabindex="0" aria-label="C source code"></pre>
+
+      <div class="controls">
+        <button id="copyBtn">Copy Code</button>
+        <button id="downloadBtn" class="secondary">Download .c</button>
+      </div>
+
+      <small class="note">Tip: After downloading, compile with <code>gcc stack_array.c -o stack_array</code> and run <code>./stack_array</code> (Linux/macOS) or use a suitable compiler on Windows.</small>
+    </section>
+  </div>
+
+  <script>
+    // Load the raw C code from the <script type="text/plain"> element and display it safely.
+    const raw = document.getElementById('cCode').textContent.trim();
+    const codeBlock = document.getElementById('codeBlock');
+    codeBlock.textContent = raw;
+
+    // Copy to clipboard
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(raw);
+        const old = document.getElementById('copyBtn').textContent;
+        document.getElementById('copyBtn').textContent = 'Copied ✓';
+        setTimeout(() => document.getElementById('copyBtn').textContent = old, 1500);
+      } catch (err) {
+        alert('Copy failed. You can select the code and press Ctrl+C.');
+      }
+    });
+
+    // Download .c file
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      const blob = new Blob([raw], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'stack_array.c';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
